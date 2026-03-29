@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { API_ERRORS, ERROR_MESSAGES } from "@/config/errors"
 
 export async function GET() {
   try {
@@ -9,8 +10,8 @@ export async function GET() {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -32,21 +33,23 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { error: "用户不存在" },
-        { status: 404 }
+        { error: API_ERRORS.USER_NOT_FOUND.message },
+        { status: API_ERRORS.USER_NOT_FOUND.code }
       )
     }
 
     return NextResponse.json({
       ...user,
+      mphone: user.phone,
+      phone: undefined,
       preferredMahjong: JSON.parse(user.preferredMahjong || "[]"),
       personalityTags: JSON.parse(user.personalityTags || "[]"),
     })
   } catch (error) {
     console.error("获取用户信息失败:", error)
     return NextResponse.json(
-      { error: "获取用户信息失败" },
-      { status: 500 }
+      { error: ERROR_MESSAGES.GET_USER_PROFILE_FAILED },
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }
@@ -57,8 +60,8 @@ export async function PUT(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -80,14 +83,16 @@ export async function PUT(request: Request) {
 
     return NextResponse.json({
       ...user,
+      mphone: user.phone,
+      phone: undefined,
       preferredMahjong: JSON.parse(user.preferredMahjong || "[]"),
       personalityTags: JSON.parse(user.personalityTags || "[]"),
     })
   } catch (error) {
     console.error("更新用户信息失败:", error)
     return NextResponse.json(
-      { error: "更新用户信息失败" },
-      { status: 500 }
+      { error: ERROR_MESSAGES.UPDATE_USER_PROFILE_FAILED },
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }

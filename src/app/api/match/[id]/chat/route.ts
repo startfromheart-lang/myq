@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { API_ERRORS } from "@/config/errors"
 
 export async function POST(
   request: NextRequest,
@@ -12,8 +13,8 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -22,7 +23,7 @@ export async function POST(
     if (!content || !content.trim()) {
       return NextResponse.json(
         { error: "消息内容不能为空" },
-        { status: 400 }
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
@@ -58,12 +59,21 @@ export async function POST(
       },
     })
 
-    return NextResponse.json(message)
+    const transformedMessage = {
+      ...message,
+      sender: {
+        ...message.sender,
+        mphone: message.sender?.phone,
+        phone: undefined,
+      },
+    }
+
+    return NextResponse.json(transformedMessage)
   } catch (error) {
     console.error("发送消息失败:", error)
     return NextResponse.json(
       { error: "发送消息失败" },
-      { status: 500 }
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }

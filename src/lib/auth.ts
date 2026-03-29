@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs"
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
-      name: "phone",
+      name: "mphone",
       credentials: {
         phone: { label: "手机号", type: "text" },
         password: { label: "密码", type: "password" },
@@ -16,8 +16,9 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        const mphone = credentials.phone
         const user = await prisma.user.findUnique({
-          where: { phone: credentials.phone },
+          where: { phone: mphone },
         })
 
         if (!user || !user.password) {

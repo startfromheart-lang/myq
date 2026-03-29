@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { API_ERRORS } from "@/config/errors"
 
 export async function POST(
   request: NextRequest,
@@ -12,8 +13,8 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -27,21 +28,21 @@ export async function POST(
     if (!matchGroup) {
       return NextResponse.json(
         { error: "匹配不存在" },
-        { status: 404 }
+        { status: API_ERRORS.USER_NOT_FOUND.code }
       )
     }
 
     if (matchGroup.status !== "matching") {
       return NextResponse.json(
         { error: "该匹配已结束" },
-        { status: 400 }
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
     if (matchGroup.participants.length >= 4) {
       return NextResponse.json(
         { error: "该匹配已满员" },
-        { status: 400 }
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
@@ -52,7 +53,7 @@ export async function POST(
     if (existingParticipant) {
       return NextResponse.json(
         { error: "您已参与该匹配" },
-        { status: 400 }
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
@@ -77,7 +78,7 @@ export async function POST(
     console.error("加入匹配失败:", error)
     return NextResponse.json(
       { error: "加入匹配失败" },
-      { status: 500 }
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }

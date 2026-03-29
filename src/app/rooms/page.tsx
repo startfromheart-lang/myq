@@ -53,7 +53,7 @@ export default function RoomsPage() {
   const getAverageRating = (room: Room) => {
     if (room.shopReviews.length === 0) return 0
     const total = room.shopReviews.reduce(
-      (acc, r) => acc + (r.environmentScore + r.serviceScore + r.cateratingScore) / 3,
+      (acc, r) => acc + (r.environmentScore + r.serviceScore + r.cateringScore) / 3,
       0
     )
     return total / room.shopReviews.length

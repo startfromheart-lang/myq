@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
         mahjongSize: data.mahjongSize,
         maxTileCount: data.maxTileCount,
         hasToilet: data.hasToilet,
-        images: [],
+        images: JSON.stringify([]),
         status: "active",
       },
     })

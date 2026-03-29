@@ -15,7 +15,7 @@ interface Participant {
   status: string
   user: {
     id: string
-    phone: string
+    mphone: string
     avatar: string | null
     realName: string | null
     skillScore: number
@@ -37,7 +37,7 @@ interface MatchGroup {
     createdAt: string
     sender: {
       id: string
-      phone: string
+      mphone: string
       avatar: string | null
       realName: string | null
     }
@@ -203,12 +203,12 @@ export default function MatchDetailPage() {
                   <Avatar>
                     <AvatarImage src={p.user.avatar || undefined} />
                     <AvatarFallback>
-                      {(p.user.realName || p.user.phone).slice(0, 2)}
+                      {(p.user.realName || p.user.mphone).slice(0, 2)}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1">
                     <p className="font-medium">
-                      {p.user.realName || p.user.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
+                      {p.user.realName || p.user.mphone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
                     </p>
                     <p className="text-xs text-muted-foreground">
                       技术 {p.user.skillScore.toFixed(1)} | 诚信 {p.user.integrityScore.toFixed(1)}
@@ -246,12 +246,12 @@ export default function MatchDetailPage() {
                     <Avatar className="w-8 h-8">
                       <AvatarImage src={msg.sender.avatar || undefined} />
                       <AvatarFallback className="text-xs">
-                        {(msg.sender.realName || msg.sender.phone).slice(0, 2)}
+                        {(msg.sender.realName || msg.sender.mphone).slice(0, 2)}
                       </AvatarFallback>
                     </Avatar>
                     <div className="flex-1">
                       <p className="text-xs text-muted-foreground">
-                        {msg.sender.realName || msg.sender.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
+                        {msg.sender.realName || msg.sender.mphone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
                       </p>
                       <p className="text-sm">{msg.content}</p>
                     </div>
