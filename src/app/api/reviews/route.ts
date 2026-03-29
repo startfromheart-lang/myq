@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!revieweeId || !matchGroupId || !skillScore || !integrityScore) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
+        { error: ErrorCodes.INVALID_PARAMS.message, code: ErrorCodes.INVALID_PARAMS.code },
         { status: 400 }
       )
     }
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
 
     if (existingReview) {
       return NextResponse.json(
-        { error: "您已评价过该用户" },
+        { error: ErrorCodes.ALREADY_REVIEWED.message, code: ErrorCodes.ALREADY_REVIEWED.code },
         { status: 400 }
       )
     }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("评价失败:", error)
     return NextResponse.json(
-      { error: "评价失败" },
+      { error: ErrorCodes.REVIEW_FAILED.message, code: ErrorCodes.REVIEW_FAILED.code },
       { status: 500 }
     )
   }

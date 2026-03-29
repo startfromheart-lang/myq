@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(
   request: NextRequest,
@@ -12,7 +13,7 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -26,21 +27,21 @@ export async function POST(
 
     if (!matchGroup) {
       return NextResponse.json(
-        { error: "匹配不存在" },
+        { error: ErrorCodes.MATCH_NOT_FOUND.message, code: ErrorCodes.MATCH_NOT_FOUND.code },
         { status: 404 }
       )
     }
 
     if (matchGroup.status !== "matching") {
       return NextResponse.json(
-        { error: "该匹配已结束" },
+        { error: ErrorCodes.MATCH_ALREADY_ENDED.message, code: ErrorCodes.MATCH_ALREADY_ENDED.code },
         { status: 400 }
       )
     }
 
     if (matchGroup.participants.length >= 4) {
       return NextResponse.json(
-        { error: "该匹配已满员" },
+        { error: ErrorCodes.MATCH_FULL.message, code: ErrorCodes.MATCH_FULL.code },
         { status: 400 }
       )
     }
@@ -51,7 +52,7 @@ export async function POST(
 
     if (existingParticipant) {
       return NextResponse.json(
-        { error: "您已参与该匹配" },
+        { error: ErrorCodes.MATCH_ALREADY_JOINED.message, code: ErrorCodes.MATCH_ALREADY_JOINED.code },
         { status: 400 }
       )
     }
@@ -76,7 +77,7 @@ export async function POST(
   } catch (error) {
     console.error("加入匹配失败:", error)
     return NextResponse.json(
-      { error: "加入匹配失败" },
+      { error: ErrorCodes.MATCH_JOIN_FAILED.message, code: ErrorCodes.MATCH_JOIN_FAILED.code },
       { status: 500 }
     )
   }

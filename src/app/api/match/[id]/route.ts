@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function GET(
   request: NextRequest,
@@ -12,7 +13,7 @@ export async function GET(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -54,7 +55,7 @@ export async function GET(
 
     if (!matchGroup) {
       return NextResponse.json(
-        { error: "匹配不存在" },
+        { error: ErrorCodes.MATCH_NOT_FOUND.message, code: ErrorCodes.MATCH_NOT_FOUND.code },
         { status: 404 }
       )
     }
@@ -63,7 +64,7 @@ export async function GET(
   } catch (error) {
     console.error("获取匹配详情失败:", error)
     return NextResponse.json(
-      { error: "获取匹配详情失败" },
+      { error: ErrorCodes.MATCH_GET_DETAIL_FAILED.message, code: ErrorCodes.MATCH_GET_DETAIL_FAILED.code },
       { status: 500 }
     )
   }

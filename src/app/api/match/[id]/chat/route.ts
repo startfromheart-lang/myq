@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(
   request: NextRequest,
@@ -12,7 +13,7 @@ export async function POST(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -21,7 +22,7 @@ export async function POST(
 
     if (!content || !content.trim()) {
       return NextResponse.json(
-        { error: "消息内容不能为空" },
+        { error: ErrorCodes.CHAT_MESSAGE_EMPTY.message, code: ErrorCodes.CHAT_MESSAGE_EMPTY.code },
         { status: 400 }
       )
     }
@@ -35,7 +36,7 @@ export async function POST(
 
     if (!participant) {
       return NextResponse.json(
-        { error: "您不是该匹配的参与者" },
+        { error: ErrorCodes.NOT_MATCH_PARTICIPANT.message, code: ErrorCodes.NOT_MATCH_PARTICIPANT.code },
         { status: 403 }
       )
     }
@@ -62,7 +63,7 @@ export async function POST(
   } catch (error) {
     console.error("发送消息失败:", error)
     return NextResponse.json(
-      { error: "发送消息失败" },
+      { error: ErrorCodes.CHAT_SEND_FAILED.message, code: ErrorCodes.CHAT_SEND_FAILED.code },
       { status: 500 }
     )
   }

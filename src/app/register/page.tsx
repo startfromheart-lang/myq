@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function RegisterPage() {
-  const [phone, setPhone] = useState("")
+  const [mphone, setMphone] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [code, setCode] = useState("")
@@ -21,7 +21,7 @@ export default function RegisterPage() {
   const { toast } = useToast()
 
   const sendCode = async () => {
-    if (!phone || phone.length !== 11) {
+    if (!mphone || mphone.length !== 11) {
       toast({
         title: "请输入正确的手机号",
         variant: "destructive",
@@ -34,7 +34,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, type: "register" }),
+        body: JSON.stringify({ mphone, type: "register" }),
       })
 
       if (res.ok) {
@@ -78,7 +78,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, password, code }),
+        body: JSON.stringify({ mphone, password, code }),
       })
 
       const data = await res.json()
@@ -117,13 +117,13 @@ export default function RegisterPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">手机号</Label>
+              <Label htmlFor="mphone">手机号</Label>
               <Input
-                id="phone"
+                id="mphone"
                 type="tel"
                 placeholder="请输入手机号"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={mphone}
+                onChange={(e) => setMphone(e.target.value)}
                 required
               />
             </div>

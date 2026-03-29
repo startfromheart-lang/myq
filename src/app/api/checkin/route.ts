@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
@@ -7,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!checkinCode) {
       return NextResponse.json(
-        { error: "请输入核销码" },
+        { error: ErrorCodes.CHECKIN_CODE_EMPTY.message, code: ErrorCodes.CHECKIN_CODE_EMPTY.code },
         { status: 400 }
       )
     }
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     if (!order) {
       return NextResponse.json(
-        { error: "核销码无效或已使用" },
+        { error: ErrorCodes.CHECKIN_CODE_INVALID.message, code: ErrorCodes.CHECKIN_CODE_INVALID.code },
         { status: 404 }
       )
     }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("核销失败:", error)
     return NextResponse.json(
-      { error: "核销失败" },
+      { error: ErrorCodes.CHECKIN_FAILED.message, code: ErrorCodes.CHECKIN_FAILED.code },
       { status: 500 }
     )
   }

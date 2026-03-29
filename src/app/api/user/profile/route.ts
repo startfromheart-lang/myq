@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function GET() {
   try {
@@ -9,7 +10,7 @@ export async function GET() {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -32,7 +33,7 @@ export async function GET() {
 
     if (!user) {
       return NextResponse.json(
-        { error: "用户不存在" },
+        { error: ErrorCodes.USER_NOT_FOUND.message, code: ErrorCodes.USER_NOT_FOUND.code },
         { status: 404 }
       )
     }
@@ -45,7 +46,7 @@ export async function GET() {
   } catch (error) {
     console.error("获取用户信息失败:", error)
     return NextResponse.json(
-      { error: "获取用户信息失败" },
+      { error: ErrorCodes.USER_PROFILE_GET_FAILED.message, code: ErrorCodes.USER_PROFILE_GET_FAILED.code },
       { status: 500 }
     )
   }
@@ -57,7 +58,7 @@ export async function PUT(request: Request) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -86,7 +87,7 @@ export async function PUT(request: Request) {
   } catch (error) {
     console.error("更新用户信息失败:", error)
     return NextResponse.json(
-      { error: "更新用户信息失败" },
+      { error: ErrorCodes.USER_UPDATE_FAILED.message, code: ErrorCodes.USER_UPDATE_FAILED.code },
       { status: 500 }
     )
   }
