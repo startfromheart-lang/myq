@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!orderId || !amount || !paymentMethod) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
+        { error: ErrorCodes.INVALID_PARAMS.message, code: ErrorCodes.INVALID_PARAMS.code },
         { status: 400 }
       )
     }
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     if (!order) {
       return NextResponse.json(
-        { error: "订单不存在" },
+        { error: ErrorCodes.ORDER_NOT_FOUND.message, code: ErrorCodes.ORDER_NOT_FOUND.code },
         { status: 404 }
       )
     }
@@ -47,7 +48,7 @@ export async function POST(request: NextRequest) {
 
     if (!isParticipant) {
       return NextResponse.json(
-        { error: "您不是该订单的参与者" },
+        { error: ErrorCodes.NOT_ORDER_PARTICIPANT.message, code: ErrorCodes.NOT_ORDER_PARTICIPANT.code },
         { status: 403 }
       )
     }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("支付失败:", error)
     return NextResponse.json(
-      { error: "支付失败" },
+      { error: ErrorCodes.PAYMENT_FAILED.message, code: ErrorCodes.PAYMENT_FAILED.code },
       { status: 500 }
     )
   }

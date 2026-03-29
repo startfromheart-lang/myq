@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
         mahjongSize: data.mahjongSize,
         maxTileCount: data.maxTileCount,
         hasToilet: data.hasToilet,
-        images: [],
+        images: "[]",
         status: "active",
       },
     })
@@ -24,7 +25,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("添加房间失败:", error)
     return NextResponse.json(
-      { error: "添加房间失败" },
+      { error: ErrorCodes.MERCHANT_ROOM_ADD_FAILED.message, code: ErrorCodes.MERCHANT_ROOM_ADD_FAILED.code },
       { status: 500 }
     )
   }

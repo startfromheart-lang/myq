@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function GET(request: NextRequest) {
   try {
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("获取麻将馆列表失败:", error)
     return NextResponse.json(
-      { error: "获取麻将馆列表失败" },
+      { error: ErrorCodes.ROOM_GET_FAILED.message, code: ErrorCodes.ROOM_GET_FAILED.code },
       { status: 500 }
     )
   }

@@ -1,32 +1,33 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, password, code } = await request.json()
+    const { mphone, password, code } = await request.json()
 
-    if (!phone || !password || !code) {
+    if (!mphone || !password || !code) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
+        { error: ErrorCodes.INVALID_PARAMS.message, code: ErrorCodes.INVALID_PARAMS.code },
         { status: 400 }
       )
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { phone },
+      where: { phone: mphone },
     })
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "该手机号已注册" },
+        { error: ErrorCodes.PHONE_ALREADY_REGISTERED.message, code: ErrorCodes.PHONE_ALREADY_REGISTERED.code },
         { status: 400 }
       )
     }
 
     const verificationCode = await prisma.verificationCode.findFirst({
       where: {
-        phone,
+        phone: mphone,
         type: "register",
         code,
         expiresAt: { gt: new Date() },
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
 
     if (!verificationCode) {
       return NextResponse.json(
-        { error: "验证码无效或已过期" },
+        { error: ErrorCodes.INVALID_VERIFICATION_CODE.message, code: ErrorCodes.INVALID_VERIFICATION_CODE.code },
         { status: 400 }
       )
     }
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.user.create({
       data: {
-        phone,
+        phone: mphone,
         password: hashedPassword,
         preferredMahjong: JSON.stringify([]),
         personalityTags: JSON.stringify([]),
@@ -59,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("注册失败:", error)
     return NextResponse.json(
-      { error: "注册失败" },
+      { error: ErrorCodes.REGISTER_FAILED.message, code: ErrorCodes.REGISTER_FAILED.code },
       { status: 500 }
     )
   }

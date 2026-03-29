@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
 
     if (!mahjongType || !regionRange) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
+        { error: ErrorCodes.INVALID_PARAMS.message, code: ErrorCodes.INVALID_PARAMS.code },
         { status: 400 }
       )
     }
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("创建匹配失败:", error)
     return NextResponse.json(
-      { error: "创建匹配失败" },
+      { error: ErrorCodes.MATCH_CREATE_FAILED.message, code: ErrorCodes.MATCH_CREATE_FAILED.code },
       { status: 500 }
     )
   }
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
+        { error: ErrorCodes.UNAUTHORIZED.message, code: ErrorCodes.UNAUTHORIZED.code },
         { status: 401 }
       )
     }
@@ -103,7 +104,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("获取匹配列表失败:", error)
     return NextResponse.json(
-      { error: "获取匹配列表失败" },
+      { error: ErrorCodes.MATCH_GET_FAILED.message, code: ErrorCodes.MATCH_GET_FAILED.code },
       { status: 500 }
     )
   }

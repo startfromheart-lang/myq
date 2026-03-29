@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
 
 export default function LoginPage() {
-  const [phone, setPhone] = useState("")
+  const [mphone, setMphone] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        phone,
+        phone: mphone,
         password,
         redirect: false,
       })
@@ -62,13 +62,13 @@ export default function LoginPage() {
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="phone">手机号</Label>
+              <Label htmlFor="mphone">手机号</Label>
               <Input
-                id="phone"
+                id="mphone"
                 type="tel"
                 placeholder="请输入手机号"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
+                value={mphone}
+                onChange={(e) => setMphone(e.target.value)}
                 required
               />
             </div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCodes } from "@/lib/error-codes"
 
 export async function GET(
   request: NextRequest,
@@ -43,7 +44,7 @@ export async function GET(
   } catch (error) {
     console.error("获取订单列表失败:", error)
     return NextResponse.json(
-      { error: "获取订单列表失败" },
+      { error: ErrorCodes.MERCHANT_ORDER_GET_FAILED.message, code: ErrorCodes.MERCHANT_ORDER_GET_FAILED.code },
       { status: 500 }
     )
   }
