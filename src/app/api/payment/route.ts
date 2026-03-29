@@ -2,25 +2,20 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { orderId, amount, paymentMethod } = await request.json()
 
     if (!orderId || !amount || !paymentMethod) {
-      return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_MISSING_PARAMS)
     }
 
     const order = await prisma.order.findUnique({
@@ -35,10 +30,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json(
-        { error: "订单不存在" },
-        { status: 404 }
-      )
+      return createErrorResponse(ErrorCode.ORDER_NOT_FOUND)
     }
 
     const isParticipant = order.matchGroup.participants.some(
@@ -46,10 +38,7 @@ export async function POST(request: NextRequest) {
     )
 
     if (!isParticipant) {
-      return NextResponse.json(
-        { error: "您不是该订单的参与者" },
-        { status: 403 }
-      )
+      return createErrorResponse(ErrorCode.ORDER_NOT_PARTICIPANT)
     }
 
     const payment = await prisma.payment.create({
@@ -83,10 +72,7 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("支付失败:", error)
-    return NextResponse.json(
-      { error: "支付失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.PAYMENT_FAILED)
   }
 }
 

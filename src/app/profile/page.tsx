@@ -12,7 +12,7 @@ import { MapPin, Users, Star, Settings, LogOut, User, Award } from "lucide-react
 
 interface UserProfile {
   id: string
-  phone: string
+  mphone: string
   realName: string | null
   avatar: string | null
   isVerified: boolean
@@ -87,12 +87,12 @@ export default function ProfilePage() {
               <Avatar className="w-16 h-16">
                 <AvatarImage src={profile.avatar || undefined} />
                 <AvatarFallback className="text-xl">
-                  {(profile.realName || profile.phone).slice(0, 2)}
+                  {(profile.realName || profile.mphone).slice(0, 2)}
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <h2 className="text-lg font-medium">
-                  {profile.realName || profile.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
+                  {profile.realName || profile.mphone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2")}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {profile.isVerified ? (

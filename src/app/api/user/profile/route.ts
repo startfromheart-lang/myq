@@ -2,23 +2,21 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
         id: true,
-        phone: true,
+        mphone: true,
         realName: true,
         avatar: true,
         isVerified: true,
@@ -31,10 +29,7 @@ export async function GET() {
     })
 
     if (!user) {
-      return NextResponse.json(
-        { error: "用户不存在" },
-        { status: 404 }
-      )
+      return createErrorResponse(ErrorCode.USER_NOT_FOUND)
     }
 
     return NextResponse.json({
@@ -44,10 +39,7 @@ export async function GET() {
     })
   } catch (error) {
     console.error("获取用户信息失败:", error)
-    return NextResponse.json(
-      { error: "获取用户信息失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.USER_GET_FAILED)
   }
 }
 
@@ -56,10 +48,7 @@ export async function PUT(request: Request) {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const data = await request.json()
@@ -85,9 +74,6 @@ export async function PUT(request: Request) {
     })
   } catch (error) {
     console.error("更新用户信息失败:", error)
-    return NextResponse.json(
-      { error: "更新用户信息失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.USER_UPDATE_FAILED)
   }
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function GET(
   request: NextRequest,
@@ -24,7 +25,7 @@ export async function GET(
               include: {
                 user: {
                   select: {
-                    phone: true,
+                    mphone: true,
                     realName: true,
                   },
                 },
@@ -42,9 +43,6 @@ export async function GET(
     return NextResponse.json(orders)
   } catch (error) {
     console.error("获取订单列表失败:", error)
-    return NextResponse.json(
-      { error: "获取订单列表失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.ORDER_LIST_FAILED)
   }
 }

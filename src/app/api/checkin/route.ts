@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
     const { checkinCode } = await request.json()
 
     if (!checkinCode) {
-      return NextResponse.json(
-        { error: "请输入核销码" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.CHECKIN_CODE_REQUIRED)
     }
 
     const order = await prisma.order.findFirst({
@@ -30,7 +28,7 @@ export async function POST(request: NextRequest) {
               include: {
                 user: {
                   select: {
-                    phone: true,
+                    mphone: true,
                     realName: true,
                   },
                 },
@@ -42,10 +40,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (!order) {
-      return NextResponse.json(
-        { error: "核销码无效或已使用" },
-        { status: 404 }
-      )
+      return createErrorResponse(ErrorCode.CHECKIN_CODE_INVALID)
     }
 
     await prisma.order.update({
@@ -65,15 +60,12 @@ export async function POST(request: NextRequest) {
         roomName: order.room.name,
         shopName: order.room.merchant.shopName,
         participants: order.matchGroup.participants.map((p) => ({
-          name: p.user.realName || p.user.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2"),
+          name: p.user.realName || p.user.mphone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2"),
         })),
       },
     })
   } catch (error) {
     console.error("核销失败:", error)
-    return NextResponse.json(
-      { error: "核销失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.CHECKIN_FAILED)
   }
 }

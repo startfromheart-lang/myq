@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,9 +24,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(room)
   } catch (error) {
     console.error("添加房间失败:", error)
-    return NextResponse.json(
-      { error: "添加房间失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.ROOM_ADD_FAILED)
   }
 }

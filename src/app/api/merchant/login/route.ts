@@ -1,30 +1,25 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
-    const { inviteCode, contactPhone } = await request.json()
+    const { inviteCode, mphone } = await request.json()
 
-    if (!inviteCode || !contactPhone) {
-      return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
-      )
+    if (!inviteCode || !mphone) {
+      return createErrorResponse(ErrorCode.AUTH_MISSING_PARAMS)
     }
 
     const merchant = await prisma.merchant.findFirst({
       where: {
         inviteCode,
-        contactPhone,
+        contactPhone: mphone,
         status: "approved",
       },
     })
 
     if (!merchant) {
-      return NextResponse.json(
-        { error: "邀请码或联系电话错误，或商家未通过审核" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.MERCHANT_INVALID_CREDENTIALS)
     }
 
     return NextResponse.json({
@@ -33,9 +28,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("商家登录失败:", error)
-    return NextResponse.json(
-      { error: "登录失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.MERCHANT_LOGIN_FAILED)
   }
 }

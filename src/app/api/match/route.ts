@@ -2,25 +2,20 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { mahjongType, regionRange, scheduledTime, duration } = await request.json()
 
     if (!mahjongType || !regionRange) {
-      return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_MISSING_PARAMS)
     }
 
     const matchGroup = await prisma.matchGroup.create({
@@ -43,10 +38,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ groupId: matchGroup.id })
   } catch (error) {
     console.error("创建匹配失败:", error)
-    return NextResponse.json(
-      { error: "创建匹配失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.MATCH_CREATE_FAILED)
   }
 }
 
@@ -55,10 +47,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { searchParams } = new URL(request.url)
@@ -84,7 +73,7 @@ export async function GET(request: NextRequest) {
             user: {
               select: {
                 id: true,
-                phone: true,
+                mphone: true,
                 avatar: true,
                 realName: true,
                 skillScore: true,
@@ -102,9 +91,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(matchGroups)
   } catch (error) {
     console.error("获取匹配列表失败:", error)
-    return NextResponse.json(
-      { error: "获取匹配列表失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.MATCH_LIST_FAILED)
   }
 }
