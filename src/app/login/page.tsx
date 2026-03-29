@@ -23,7 +23,7 @@ export default function LoginPage() {
 
     try {
       const result = await signIn("credentials", {
-        phone: mphone,
+        mphone,
         password,
         redirect: false,
       })

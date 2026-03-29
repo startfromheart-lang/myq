@@ -8,15 +8,15 @@ export const authOptions: NextAuthOptions = {
     CredentialsProvider({
       name: "mphone",
       credentials: {
-        phone: { label: "手机号", type: "text" },
+        mphone: { label: "手机号", type: "text" },
         password: { label: "密码", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials?.phone || !credentials?.password) {
+        if (!credentials?.mphone || !credentials?.password) {
           return null
         }
 
-        const mphone = credentials.phone
+        const mphone = credentials.mphone
         const user = await prisma.user.findUnique({
           where: { phone: mphone },
         })
@@ -37,6 +37,7 @@ export const authOptions: NextAuthOptions = {
         return {
           id: user.id,
           phone: user.phone,
+          mphone: user.phone,
           name: user.realName || user.phone,
           image: user.avatar,
         }

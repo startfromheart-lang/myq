@@ -5,7 +5,7 @@ import { API_ERRORS, ERROR_MESSAGES } from "@/config/errors"
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone: mphone, type } = await request.json()
+    const { mphone, type } = await request.json()
 
     if (!mphone || !type) {
       return NextResponse.json(

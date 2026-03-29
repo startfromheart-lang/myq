@@ -67,6 +67,7 @@ export async function POST(request: NextRequest) {
         shopName: order.room.merchant.shopName,
         participants: order.matchGroup.participants.map((p) => ({
           name: p.user.realName || p.user.phone.replace(/(\d{3})\d{4}(\d{4})/, "$1****$2"),
+          mphone: p.user.phone,
         })),
       },
     })

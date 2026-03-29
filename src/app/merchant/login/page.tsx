@@ -24,7 +24,7 @@ export default function MerchantLoginPage() {
       const res = await fetch("/api/merchant/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteCode, contactPhone: contactMphone }),
+        body: JSON.stringify({ inviteCode, contactMphone }),
       })
 
       const data = await res.json()

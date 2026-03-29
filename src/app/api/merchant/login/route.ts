@@ -4,7 +4,7 @@ import { API_ERRORS, ERROR_MESSAGES } from "@/config/errors"
 
 export async function POST(request: NextRequest) {
   try {
-    const { inviteCode, contactPhone: contactMphone } = await request.json()
+    const { inviteCode, contactMphone } = await request.json()
 
     if (!inviteCode || !contactMphone) {
       return NextResponse.json(

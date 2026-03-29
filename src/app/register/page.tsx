@@ -34,7 +34,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/send-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: mphone, type: "register" }),
+        body: JSON.stringify({ mphone, type: "register" }),
       })
 
       if (res.ok) {
@@ -78,7 +78,7 @@ export default function RegisterPage() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: mphone, password, code }),
+        body: JSON.stringify({ mphone, password, code }),
       })
 
       const data = await res.json()
