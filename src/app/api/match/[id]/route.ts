@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { API_ERRORS } from "@/config/errors"
 
 export async function GET(
   request: NextRequest,
@@ -12,8 +13,8 @@ export async function GET(
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -55,16 +56,36 @@ export async function GET(
     if (!matchGroup) {
       return NextResponse.json(
         { error: "匹配不存在" },
-        { status: 404 }
+        { status: API_ERRORS.USER_NOT_FOUND.code }
       )
     }
 
-    return NextResponse.json(matchGroup)
+    const transformedMatchGroup = {
+      ...matchGroup,
+      participants: matchGroup.participants.map((participant) => ({
+        ...participant,
+        user: {
+          ...participant.user,
+          mphone: participant.user?.phone,
+          phone: undefined,
+        },
+      })),
+      chatMessages: matchGroup.chatMessages.map((message) => ({
+        ...message,
+        sender: {
+          ...message.sender,
+          mphone: message.sender?.phone,
+          phone: undefined,
+        },
+      })),
+    }
+
+    return NextResponse.json(transformedMatchGroup)
   } catch (error) {
     console.error("获取匹配详情失败:", error)
     return NextResponse.json(
       { error: "获取匹配详情失败" },
-      { status: 500 }
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }

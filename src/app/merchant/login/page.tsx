@@ -11,7 +11,7 @@ import { useToast } from "@/components/ui/use-toast"
 
 export default function MerchantLoginPage() {
   const [inviteCode, setInviteCode] = useState("")
-  const [contactPhone, setContactPhone] = useState("")
+  const [contactMphone, setContactMphone] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -24,7 +24,7 @@ export default function MerchantLoginPage() {
       const res = await fetch("/api/merchant/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inviteCode, contactPhone }),
+        body: JSON.stringify({ inviteCode, contactMphone }),
       })
 
       const data = await res.json()
@@ -74,13 +74,13 @@ export default function MerchantLoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="contactPhone">联系电话</Label>
+              <Label htmlFor="contactMphone">联系电话</Label>
               <Input
-                id="contactPhone"
+                id="contactMphone"
                 type="tel"
                 placeholder="请输入联系电话"
-                value={contactPhone}
-                onChange={(e) => setContactPhone(e.target.value)}
+                value={contactMphone}
+                onChange={(e) => setContactMphone(e.target.value)}
                 required
               />
             </div>

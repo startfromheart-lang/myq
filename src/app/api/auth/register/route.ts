@@ -1,32 +1,33 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
+import { API_ERRORS, ERROR_MESSAGES } from "@/config/errors"
 
 export async function POST(request: NextRequest) {
   try {
-    const { phone, password, code } = await request.json()
+    const { mphone, password, code } = await request.json()
 
-    if (!phone || !password || !code) {
+    if (!mphone || !password || !code) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
+        { error: API_ERRORS.MISSING_PARAMS.message },
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { phone },
+      where: { phone: mphone },
     })
 
     if (existingUser) {
       return NextResponse.json(
-        { error: "该手机号已注册" },
-        { status: 400 }
+        { error: ERROR_MESSAGES.PHONE_EXISTS },
+        { status: API_ERRORS.PHONE_EXISTS.code }
       )
     }
 
     const verificationCode = await prisma.verificationCode.findFirst({
       where: {
-        phone,
+        phone: mphone,
         type: "register",
         code,
         expiresAt: { gt: new Date() },
@@ -35,8 +36,8 @@ export async function POST(request: NextRequest) {
 
     if (!verificationCode) {
       return NextResponse.json(
-        { error: "验证码无效或已过期" },
-        { status: 400 }
+        { error: API_ERRORS.INVALID_CODE.message },
+        { status: API_ERRORS.INVALID_CODE.code }
       )
     }
 
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.user.create({
       data: {
-        phone,
+        phone: mphone,
         password: hashedPassword,
         preferredMahjong: JSON.stringify([]),
         personalityTags: JSON.stringify([]),
@@ -59,8 +60,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("注册失败:", error)
     return NextResponse.json(
-      { error: "注册失败" },
-      { status: 500 }
+      { error: ERROR_MESSAGES.REGISTER_FAILED },
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }

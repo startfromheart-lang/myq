@@ -12,7 +12,7 @@ import { ArrowLeft, Users, MapPin, DollarSign, Calendar, Plus, Settings } from "
 interface MerchantInfo {
   id: string
   shopName: string
-  contactPhone: string
+  contactMphone: string
   status: string
 }
 
@@ -36,7 +36,7 @@ interface Order {
   matchGroup: {
     participants: {
       user: {
-        phone: string
+        mphone: string
         realName: string | null
       }
     }[]

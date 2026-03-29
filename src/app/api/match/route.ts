@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { API_ERRORS, ERROR_MESSAGES } from "@/config/errors"
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,8 +10,8 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -18,8 +19,8 @@ export async function POST(request: NextRequest) {
 
     if (!mahjongType || !regionRange) {
       return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
+        { error: API_ERRORS.MISSING_PARAMS.message },
+        { status: API_ERRORS.MISSING_PARAMS.code }
       )
     }
 
@@ -44,8 +45,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("创建匹配失败:", error)
     return NextResponse.json(
-      { error: "创建匹配失败" },
-      { status: 500 }
+      { error: ERROR_MESSAGES.CREATE_MATCH_FAILED },
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }
@@ -56,8 +57,8 @@ export async function GET(request: NextRequest) {
 
     if (!session?.user?.id) {
       return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
+        { error: API_ERRORS.USER_NOT_LOGIN.message },
+        { status: API_ERRORS.USER_NOT_LOGIN.code }
       )
     }
 
@@ -99,12 +100,24 @@ export async function GET(request: NextRequest) {
       },
     })
 
-    return NextResponse.json(matchGroups)
+    const transformedMatchGroups = matchGroups.map((group) => ({
+      ...group,
+      participants: group.participants.map((participant) => ({
+        ...participant,
+        user: {
+          ...participant.user,
+          mphone: participant.user?.phone,
+          phone: undefined,
+        },
+      })),
+    }))
+
+    return NextResponse.json(transformedMatchGroups)
   } catch (error) {
     console.error("获取匹配列表失败:", error)
     return NextResponse.json(
-      { error: "获取匹配列表失败" },
-      { status: 500 }
+      { error: ERROR_MESSAGES.GET_MATCH_LIST_FAILED },
+      { status: API_ERRORS.INTERNAL_ERROR.code }
     )
   }
 }
