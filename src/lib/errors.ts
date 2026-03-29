@@ -1,0 +1,154 @@
+export const ErrorCode = {
+  AUTH_LOGIN_REQUIRED: "AUTH_LOGIN_REQUIRED",
+  AUTH_MISSING_PARAMS: "AUTH_MISSING_PARAMS",
+  AUTH_PHONE_REGISTERED: "AUTH_PHONE_REGISTERED",
+  AUTH_PHONE_NOT_REGISTERED: "AUTH_PHONE_NOT_REGISTERED",
+  AUTH_CODE_INVALID: "AUTH_CODE_INVALID",
+  AUTH_SEND_CODE_FAILED: "AUTH_SEND_CODE_FAILED",
+  AUTH_REGISTER_FAILED: "AUTH_REGISTER_FAILED",
+  AUTH_LOGIN_FAILED: "AUTH_LOGIN_FAILED",
+
+  MATCH_CREATE_FAILED: "MATCH_CREATE_FAILED",
+  MATCH_LIST_FAILED: "MATCH_LIST_FAILED",
+  MATCH_NOT_FOUND: "MATCH_NOT_FOUND",
+  MATCH_ENDED: "MATCH_ENDED",
+  MATCH_FULL: "MATCH_FULL",
+  MATCH_ALREADY_JOINED: "MATCH_ALREADY_JOINED",
+  MATCH_JOIN_FAILED: "MATCH_JOIN_FAILED",
+  MATCH_DETAIL_FAILED: "MATCH_DETAIL_FAILED",
+
+  ORDER_CREATE_FAILED: "ORDER_CREATE_FAILED",
+  ORDER_LIST_FAILED: "ORDER_LIST_FAILED",
+  ORDER_NOT_FOUND: "ORDER_NOT_FOUND",
+  ORDER_NOT_PARTICIPANT: "ORDER_NOT_PARTICIPANT",
+
+  PAYMENT_FAILED: "PAYMENT_FAILED",
+
+  USER_NOT_FOUND: "USER_NOT_FOUND",
+  USER_GET_FAILED: "USER_GET_FAILED",
+  USER_UPDATE_FAILED: "USER_UPDATE_FAILED",
+
+  MERCHANT_LOGIN_FAILED: "MERCHANT_LOGIN_FAILED",
+  MERCHANT_INVALID_CREDENTIALS: "MERCHANT_INVALID_CREDENTIALS",
+  ROOM_ADD_FAILED: "ROOM_ADD_FAILED",
+  ROOM_LIST_FAILED: "ROOM_LIST_FAILED",
+  ROOM_SHOP_LIST_FAILED: "ROOM_SHOP_LIST_FAILED",
+
+  CHECKIN_CODE_REQUIRED: "CHECKIN_CODE_REQUIRED",
+  CHECKIN_CODE_INVALID: "CHECKIN_CODE_INVALID",
+  CHECKIN_FAILED: "CHECKIN_FAILED",
+
+  CHAT_CONTENT_EMPTY: "CHAT_CONTENT_EMPTY",
+  CHAT_NOT_PARTICIPANT: "CHAT_NOT_PARTICIPANT",
+  CHAT_SEND_FAILED: "CHAT_SEND_FAILED",
+
+  REVIEW_ALREADY_DONE: "REVIEW_ALREADY_DONE",
+  REVIEW_FAILED: "REVIEW_FAILED",
+} as const
+
+export type ErrorCodeType = (typeof ErrorCode)[keyof typeof ErrorCode]
+
+export const ErrorMessage: Record<ErrorCodeType, string> = {
+  [ErrorCode.AUTH_LOGIN_REQUIRED]: "请先登录",
+  [ErrorCode.AUTH_MISSING_PARAMS]: "缺少必要参数",
+  [ErrorCode.AUTH_PHONE_REGISTERED]: "该手机号已注册",
+  [ErrorCode.AUTH_PHONE_NOT_REGISTERED]: "该手机号未注册",
+  [ErrorCode.AUTH_CODE_INVALID]: "验证码无效或已过期",
+  [ErrorCode.AUTH_SEND_CODE_FAILED]: "发送验证码失败",
+  [ErrorCode.AUTH_REGISTER_FAILED]: "注册失败",
+  [ErrorCode.AUTH_LOGIN_FAILED]: "登录失败",
+
+  [ErrorCode.MATCH_CREATE_FAILED]: "创建匹配失败",
+  [ErrorCode.MATCH_LIST_FAILED]: "获取匹配列表失败",
+  [ErrorCode.MATCH_NOT_FOUND]: "匹配不存在",
+  [ErrorCode.MATCH_ENDED]: "该匹配已结束",
+  [ErrorCode.MATCH_FULL]: "该匹配已满员",
+  [ErrorCode.MATCH_ALREADY_JOINED]: "您已参与该匹配",
+  [ErrorCode.MATCH_JOIN_FAILED]: "加入匹配失败",
+  [ErrorCode.MATCH_DETAIL_FAILED]: "获取匹配详情失败",
+
+  [ErrorCode.ORDER_CREATE_FAILED]: "创建订单失败",
+  [ErrorCode.ORDER_LIST_FAILED]: "获取订单列表失败",
+  [ErrorCode.ORDER_NOT_FOUND]: "订单不存在",
+  [ErrorCode.ORDER_NOT_PARTICIPANT]: "您不是该订单的参与者",
+
+  [ErrorCode.PAYMENT_FAILED]: "支付失败",
+
+  [ErrorCode.USER_NOT_FOUND]: "用户不存在",
+  [ErrorCode.USER_GET_FAILED]: "获取用户信息失败",
+  [ErrorCode.USER_UPDATE_FAILED]: "更新用户信息失败",
+
+  [ErrorCode.MERCHANT_LOGIN_FAILED]: "登录失败",
+  [ErrorCode.MERCHANT_INVALID_CREDENTIALS]: "邀请码或联系电话错误，或商家未通过审核",
+  [ErrorCode.ROOM_ADD_FAILED]: "添加房间失败",
+  [ErrorCode.ROOM_LIST_FAILED]: "获取房间列表失败",
+  [ErrorCode.ROOM_SHOP_LIST_FAILED]: "获取麻将馆列表失败",
+
+  [ErrorCode.CHECKIN_CODE_REQUIRED]: "请输入核销码",
+  [ErrorCode.CHECKIN_CODE_INVALID]: "核销码无效或已使用",
+  [ErrorCode.CHECKIN_FAILED]: "核销失败",
+
+  [ErrorCode.CHAT_CONTENT_EMPTY]: "消息内容不能为空",
+  [ErrorCode.CHAT_NOT_PARTICIPANT]: "您不是该匹配的参与者",
+  [ErrorCode.CHAT_SEND_FAILED]: "发送消息失败",
+
+  [ErrorCode.REVIEW_ALREADY_DONE]: "您已评价过该用户",
+  [ErrorCode.REVIEW_FAILED]: "评价失败",
+}
+
+export const ErrorStatus: Record<ErrorCodeType, number> = {
+  [ErrorCode.AUTH_LOGIN_REQUIRED]: 401,
+  [ErrorCode.AUTH_MISSING_PARAMS]: 400,
+  [ErrorCode.AUTH_PHONE_REGISTERED]: 400,
+  [ErrorCode.AUTH_PHONE_NOT_REGISTERED]: 400,
+  [ErrorCode.AUTH_CODE_INVALID]: 400,
+  [ErrorCode.AUTH_SEND_CODE_FAILED]: 500,
+  [ErrorCode.AUTH_REGISTER_FAILED]: 500,
+  [ErrorCode.AUTH_LOGIN_FAILED]: 500,
+
+  [ErrorCode.MATCH_CREATE_FAILED]: 500,
+  [ErrorCode.MATCH_LIST_FAILED]: 500,
+  [ErrorCode.MATCH_NOT_FOUND]: 404,
+  [ErrorCode.MATCH_ENDED]: 400,
+  [ErrorCode.MATCH_FULL]: 400,
+  [ErrorCode.MATCH_ALREADY_JOINED]: 400,
+  [ErrorCode.MATCH_JOIN_FAILED]: 500,
+  [ErrorCode.MATCH_DETAIL_FAILED]: 500,
+
+  [ErrorCode.ORDER_CREATE_FAILED]: 500,
+  [ErrorCode.ORDER_LIST_FAILED]: 500,
+  [ErrorCode.ORDER_NOT_FOUND]: 404,
+  [ErrorCode.ORDER_NOT_PARTICIPANT]: 403,
+
+  [ErrorCode.PAYMENT_FAILED]: 500,
+
+  [ErrorCode.USER_NOT_FOUND]: 404,
+  [ErrorCode.USER_GET_FAILED]: 500,
+  [ErrorCode.USER_UPDATE_FAILED]: 500,
+
+  [ErrorCode.MERCHANT_LOGIN_FAILED]: 500,
+  [ErrorCode.MERCHANT_INVALID_CREDENTIALS]: 401,
+  [ErrorCode.ROOM_ADD_FAILED]: 500,
+  [ErrorCode.ROOM_LIST_FAILED]: 500,
+  [ErrorCode.ROOM_SHOP_LIST_FAILED]: 500,
+
+  [ErrorCode.CHECKIN_CODE_REQUIRED]: 400,
+  [ErrorCode.CHECKIN_CODE_INVALID]: 404,
+  [ErrorCode.CHECKIN_FAILED]: 500,
+
+  [ErrorCode.CHAT_CONTENT_EMPTY]: 400,
+  [ErrorCode.CHAT_NOT_PARTICIPANT]: 403,
+  [ErrorCode.CHAT_SEND_FAILED]: 500,
+
+  [ErrorCode.REVIEW_ALREADY_DONE]: 400,
+  [ErrorCode.REVIEW_FAILED]: 500,
+}
+
+import { NextResponse } from "next/server"
+
+export function createErrorResponse(code: ErrorCodeType): NextResponse {
+  return NextResponse.json(
+    { error: ErrorMessage[code], code },
+    { status: ErrorStatus[code] }
+  )
+}

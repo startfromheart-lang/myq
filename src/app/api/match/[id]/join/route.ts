@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(
   request: NextRequest,
@@ -11,10 +12,7 @@ export async function POST(
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const matchGroup = await prisma.matchGroup.findUnique({
@@ -25,24 +23,15 @@ export async function POST(
     })
 
     if (!matchGroup) {
-      return NextResponse.json(
-        { error: "匹配不存在" },
-        { status: 404 }
-      )
+      return createErrorResponse(ErrorCode.MATCH_NOT_FOUND)
     }
 
     if (matchGroup.status !== "matching") {
-      return NextResponse.json(
-        { error: "该匹配已结束" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.MATCH_ENDED)
     }
 
     if (matchGroup.participants.length >= 4) {
-      return NextResponse.json(
-        { error: "该匹配已满员" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.MATCH_FULL)
     }
 
     const existingParticipant = matchGroup.participants.find(
@@ -50,10 +39,7 @@ export async function POST(
     )
 
     if (existingParticipant) {
-      return NextResponse.json(
-        { error: "您已参与该匹配" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.MATCH_ALREADY_JOINED)
     }
 
     await prisma.matchGroupParticipant.create({
@@ -75,9 +61,6 @@ export async function POST(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("加入匹配失败:", error)
-    return NextResponse.json(
-      { error: "加入匹配失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.MATCH_JOIN_FAILED)
   }
 }

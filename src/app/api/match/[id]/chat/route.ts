@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(
   request: NextRequest,
@@ -11,19 +12,13 @@ export async function POST(
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { content } = await request.json()
 
     if (!content || !content.trim()) {
-      return NextResponse.json(
-        { error: "消息内容不能为空" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.CHAT_CONTENT_EMPTY)
     }
 
     const participant = await prisma.matchGroupParticipant.findFirst({
@@ -34,10 +29,7 @@ export async function POST(
     })
 
     if (!participant) {
-      return NextResponse.json(
-        { error: "您不是该匹配的参与者" },
-        { status: 403 }
-      )
+      return createErrorResponse(ErrorCode.CHAT_NOT_PARTICIPANT)
     }
 
     const message = await prisma.chatMessage.create({
@@ -50,7 +42,7 @@ export async function POST(
         sender: {
           select: {
             id: true,
-            phone: true,
+            mphone: true,
             avatar: true,
             realName: true,
           },
@@ -61,9 +53,6 @@ export async function POST(
     return NextResponse.json(message)
   } catch (error) {
     console.error("发送消息失败:", error)
-    return NextResponse.json(
-      { error: "发送消息失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.CHAT_SEND_FAILED)
   }
 }

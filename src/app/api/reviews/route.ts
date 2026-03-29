@@ -2,25 +2,20 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { revieweeId, matchGroupId, skillScore, integrityScore, personalityTags, content } = await request.json()
 
     if (!revieweeId || !matchGroupId || !skillScore || !integrityScore) {
-      return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_MISSING_PARAMS)
     }
 
     const existingReview = await prisma.review.findFirst({
@@ -32,10 +27,7 @@ export async function POST(request: NextRequest) {
     })
 
     if (existingReview) {
-      return NextResponse.json(
-        { error: "您已评价过该用户" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.REVIEW_ALREADY_DONE)
     }
 
     const review = await prisma.review.create({
@@ -54,8 +46,8 @@ export async function POST(request: NextRequest) {
       where: { revieweeId },
     })
 
-    const avgSkillScore = userReviews.reduce((acc, r) => acc + r.skillScore, 0) / userReviews.length
-    const avgIntegrityScore = userReviews.reduce((acc, r) => acc + r.integrityScore, 0) / userReviews.length
+    const avgSkillScore = userReviews.reduce((acc: number, r: { skillScore: number }) => acc + r.skillScore, 0) / userReviews.length
+    const avgIntegrityScore = userReviews.reduce((acc: number, r: { integrityScore: number }) => acc + r.integrityScore, 0) / userReviews.length
 
     await prisma.user.update({
       where: { id: revieweeId },
@@ -71,9 +63,6 @@ export async function POST(request: NextRequest) {
     })
   } catch (error) {
     console.error("评价失败:", error)
-    return NextResponse.json(
-      { error: "评价失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.REVIEW_FAILED)
   }
 }

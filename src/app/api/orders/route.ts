@@ -3,25 +3,20 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { generateCheckinCode } from "@/lib/utils"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const { matchGroupId, roomId, totalAmount } = await request.json()
 
     if (!matchGroupId || !roomId || !totalAmount) {
-      return NextResponse.json(
-        { error: "缺少必要参数" },
-        { status: 400 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_MISSING_PARAMS)
     }
 
     const checkinCode = generateCheckinCode()
@@ -44,10 +39,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(order)
   } catch (error) {
     console.error("创建订单失败:", error)
-    return NextResponse.json(
-      { error: "创建订单失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.ORDER_CREATE_FAILED)
   }
 }
 
@@ -56,10 +48,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const orders = await prisma.order.findMany({
@@ -88,7 +77,7 @@ export async function GET(request: NextRequest) {
               include: {
                 user: {
                   select: {
-                    phone: true,
+                    mphone: true,
                     realName: true,
                   },
                 },
@@ -105,9 +94,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(orders)
   } catch (error) {
     console.error("获取订单列表失败:", error)
-    return NextResponse.json(
-      { error: "获取订单列表失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.ORDER_LIST_FAILED)
   }
 }

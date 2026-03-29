@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { ErrorCode, createErrorResponse } from "@/lib/errors"
 
 export async function GET(
   request: NextRequest,
@@ -11,10 +12,7 @@ export async function GET(
     const session = await getServerSession(authOptions)
 
     if (!session?.user?.id) {
-      return NextResponse.json(
-        { error: "请先登录" },
-        { status: 401 }
-      )
+      return createErrorResponse(ErrorCode.AUTH_LOGIN_REQUIRED)
     }
 
     const matchGroup = await prisma.matchGroup.findUnique({
@@ -25,7 +23,7 @@ export async function GET(
             user: {
               select: {
                 id: true,
-                phone: true,
+                mphone: true,
                 avatar: true,
                 realName: true,
                 skillScore: true,
@@ -39,7 +37,7 @@ export async function GET(
             sender: {
               select: {
                 id: true,
-                phone: true,
+                mphone: true,
                 avatar: true,
                 realName: true,
               },
@@ -53,18 +51,12 @@ export async function GET(
     })
 
     if (!matchGroup) {
-      return NextResponse.json(
-        { error: "匹配不存在" },
-        { status: 404 }
-      )
+      return createErrorResponse(ErrorCode.MATCH_NOT_FOUND)
     }
 
     return NextResponse.json(matchGroup)
   } catch (error) {
     console.error("获取匹配详情失败:", error)
-    return NextResponse.json(
-      { error: "获取匹配详情失败" },
-      { status: 500 }
-    )
+    return createErrorResponse(ErrorCode.MATCH_DETAIL_FAILED)
   }
 }
